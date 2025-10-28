@@ -219,6 +219,43 @@ ohlcv = get_ohlcv_data(token_address, timeframe='1H', days_back=3)
 price = token_price(token_address)
 ```
 
+### Strategy Testing & Analysis Utilities
+
+**Multi-Asset Strategy Tester** (`src/agents/rbi_multi_asset_tester.py`):
+- Tests a single strategy across multiple cryptocurrency assets
+- Identifies which markets work best with specific strategy logic
+- Parallel execution across all available OHLCV data files
+- Usage:
+```bash
+python scripts/test_strategy_multi_asset.py <strategy_file.py>
+python scripts/test_strategy_multi_asset.py strategy.py --workers 8
+```
+
+**Strategy Discovery Tool** (`src/scripts/find_strategies.py`):
+- Discovers and catalogs all 1,377+ backtest strategies in the project
+- Groups by date folder, filters by criteria, exports to CSV/JSON
+- Usage:
+```bash
+python scripts/find_strategies.py
+python scripts/find_strategies.py --latest 50
+python scripts/find_strategies.py --date-folder 03_14_2025 --output inventory.csv
+```
+
+**RBI Results Analyzer** (`src/scripts/analyze_rbi_results.py`):
+- Analyzes backtest results from RBI batch runs
+- Generates summary reports, exports to Excel, creates distribution plots
+- Filters strategies by Sharpe Ratio, return %, number of trades
+- Usage:
+```bash
+python scripts/analyze_rbi_results.py results.json
+python scripts/analyze_rbi_results.py results.json --excel output.xlsx --plots
+python scripts/analyze_rbi_results.py results.json --min-sharpe 2.0 --min-return 10
+```
+
+**Data Location**: OHLCV data for backtesting stored at `src/data/ohlcv/`
+- Contains historical price data for BTC, ETH, SOL, XRP, DOGE, ZEC, SUI, ASTER
+- Used by multi-asset tester and individual strategy backtests
+
 ## Project Philosophy
 
 This is an **experimental, educational project** demonstrating AI agent patterns through algorithmic trading:

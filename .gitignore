@@ -154,5 +154,9 @@ binance_trades.csv
 *.csv.gz
 *.parquet
 
+# OHLCV data files (too large for git - 1.2GB+)
+src/data/ohlcv/*.csv
+src/data/rbi/backups/
+
 # Ignore large video files (assistant)
 src/data/chat_agent/*.mov
