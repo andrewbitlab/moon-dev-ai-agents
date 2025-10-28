@@ -9,6 +9,10 @@ This is an experimental AI trading system that orchestrates 48+ specialized AI a
 ## Key Development Commands
 
 ### Environment Setup
+
+**Windows 11 + WSL2:** See [wsl2-setup/README.md](wsl2-setup/README.md) for automated installation (4 steps)
+
+**macOS/Linux:**
 ```bash
 # Use existing conda environment (DO NOT create new virtual environments)
 conda activate tflow
