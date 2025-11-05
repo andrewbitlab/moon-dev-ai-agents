@@ -248,23 +248,28 @@ def market_buy(token, amount, slippage):
     if not http_client:
         raise ValueError("🚨 RPC_ENDPOINT not found in environment variables!")
 
-    quote = requests.get(f'https://quote-api.jup.ag/v6/quote?inputMint={QUOTE_TOKEN}&outputMint={token}&amount={amount}&slippageBps={SLIPPAGE}').json()
-    #print(quote)
+    # Convert amount from dollars to USDC units (6 decimals)
+    amount_in_units = int(amount * 1_000_000)
+    print(f"💰 Converting ${amount} to {amount_in_units:,} USDC units")
 
-    txRes = requests.post('https://quote-api.jup.ag/v6/swap',
+    # Use Jupiter Lite API (faster and more efficient)
+    quote = requests.get(f'https://lite-api.jup.ag/swap/v1/quote?inputMint={QUOTE_TOKEN}&outputMint={token}&amount={amount_in_units}&slippageBps={SLIPPAGE}').json()
+
+    txRes = requests.post('https://lite-api.jup.ag/swap/v1/swap',
                           headers={"Content-Type": "application/json"},
                           data=json.dumps({
                               "quoteResponse": quote,
                               "userPublicKey": str(KEY.pubkey()),
                               "prioritizationFeeLamports": PRIORITY_FEE  # or replace 'auto' with your specific lamport value
                           })).json()
-    #print(txRes)
+
     swapTx = base64.b64decode(txRes['swapTransaction'])
-    #print(swapTx)
     tx1 = VersionedTransaction.from_bytes(swapTx)
     tx = VersionedTransaction(tx1.message, [KEY])
     txId = http_client.send_raw_transaction(bytes(tx), TxOpts(skip_preflight=True)).value
     print(f"https://solscan.io/tx/{str(txId)}")
+    return str(txId)  # Return the transaction ID for the calling function to use
+    return str(txId)  # Return the transaction ID for the calling function to use
 
 
 
@@ -292,9 +297,10 @@ def market_sell(QUOTE_TOKEN, amount, slippage):
         raise ValueError("🚨 RPC_ENDPOINT not found in environment variables!")
     print('http client success')
 
-    quote = requests.get(f'https://quote-api.jup.ag/v6/quote?inputMint={QUOTE_TOKEN}&outputMint={token}&amount={amount}&slippageBps={SLIPPAGE}').json()
+    # Use Jupiter Lite API (faster and more efficient)
+    quote = requests.get(f'https://lite-api.jup.ag/swap/v1/quote?inputMint={QUOTE_TOKEN}&outputMint={token}&amount={amount}&slippageBps={SLIPPAGE}').json()
     #print(quote)
-    txRes = requests.post('https://quote-api.jup.ag/v6/swap',
+    txRes = requests.post('https://lite-api.jup.ag/swap/v1/swap',
                           headers={"Content-Type": "application/json"},
                           data=json.dumps({
                               "quoteResponse": quote,
@@ -310,6 +316,7 @@ def market_sell(QUOTE_TOKEN, amount, slippage):
     #print(tx)
     txId = http_client.send_raw_transaction(bytes(tx), TxOpts(skip_preflight=True)).value
     print(f"https://solscan.io/tx/{str(txId)}")
+    return str(txId)  # Return the transaction ID for the calling function to use
 
 
 
